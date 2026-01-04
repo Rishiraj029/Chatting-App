@@ -1,0 +1,32 @@
+node_modules
+.env
+
+# Node.js
+node_modules/
+package-lock.json
+dist/
+build/
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# Logs
+logs/
+*.log
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Optional: Ignore local database and coverage
+coverage/
+data/
+
+# Ignore .git folder if you want to prevent accidental re-initialization
+.git/
