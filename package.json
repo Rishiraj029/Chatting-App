@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Rishiraj029/Chatting-App#readme",
   "dependencies": {
+    "nodemailer": "^7.0.12",
     "resend": "^6.6.0"
   }
 }

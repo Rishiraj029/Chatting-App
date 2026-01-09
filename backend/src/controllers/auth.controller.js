@@ -38,11 +38,6 @@ export const signup = async (req, res) => {
     });
 
     if (newUser) {
-      // before CR:
-      // generateToken(newUser._id, res);
-      // await newUser.save();
-
-      // after CR:
       // Persist user first, then issue auth cookie
       const savedUser = await newUser.save();
       generateToken(savedUser._id, res);
@@ -54,11 +49,11 @@ export const signup = async (req, res) => {
         // ...existing code...
       });
 
-      try {
-        await sendWelcomeEmail(savedUser.email, savedUser.fullName,ENV.CLIENT_URL);
-      } catch (error) {
-        console.error("Failed to send welcome email:", error);
-      }
+      // Send welcome email asynchronously, do not block signup
+      sendWelcomeEmail(savedUser.email, savedUser.fullName, ENV.CLIENT_URL)
+        .catch((error) => {
+          console.error("Failed to send welcome email:", error);
+        });
     } else {
       res.status(400).json({ message: "Invalid user data" });
     }
@@ -70,18 +65,12 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
-  }
-
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
-    // never tell the client which one is incorrect: password or email
+    if (!user) return res.status(400).json({ message: "Invalid Credentials" });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid Credentials" });
 
     generateToken(user._id, res);
 
@@ -89,17 +78,18 @@ export const login = async (req, res) => {
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
-      // ...existing code...
+      profilePic: user.profilePic, // Uncomment if you use profilePic
     });
   } catch (error) {
-    console.error("Error in login controller:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.log("Error in login controller:", error);
+    res.status(500).json({ message: "Internal Server error" });
   }
 };
 
-export const logout = (_, res) => {
+export const logout = async (_, res) => {
   res.cookie("jwt", "", { maxAge: 0 });
-  res.status(200).json({ message: "Logged out successfully" });
+  res.status(200).json({ message: "Logged Out Succesfully" });
 };
+
 
 // ...existing code...
